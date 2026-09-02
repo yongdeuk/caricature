@@ -5,7 +5,7 @@
 
 ## 동작 방식
 
-1. [face-api.js](https://github.com/justadudewhohacks/face-api.js)로 얼굴 랜드마크(눈, 입, 얼굴 윤곽)를 인식합니다.
+1. [face-api.js](https://github.com/justadudewhohacks/face-api.js)(정확히는 [@vladmandic/face-api](https://github.com/vladmandic/face-api) 빌드, MIT 라이선스)로 얼굴 랜드마크(눈, 입, 얼굴 윤곽)를 인식합니다. 라이브러리와 모델 가중치는 `vendor/`, `models/`에 함께 포함되어 있어 외부 CDN 없이 완전히 오프라인으로 동작합니다.
 2. 랜드마크를 기준으로 눈/입을 확대하고 얼굴 폭을 좁히는 왜곡(bulge/pinch warp)을 적용합니다.
 3. 색상 포스터라이즈와 Sobel 외곽선 검출로 카툰 느낌의 스타일을 입힙니다.
 4. 결과 이미지를 PNG로 다운로드할 수 있습니다.

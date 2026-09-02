@@ -1,4 +1,4 @@
-const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js/weights';
+const MODEL_URL = './models';
 const MAX_DIMENSION = 720;
 
 const els = {

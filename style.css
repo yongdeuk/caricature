@@ -64,6 +64,8 @@ button.secondary:hover { background: #666; }
 
 .file-btn { display: inline-flex; align-items: center; }
 
+.camera-view[hidden] { display: none; }
+
 .camera-view {
   margin-bottom: 1rem;
   display: flex;
