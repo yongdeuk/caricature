@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>캐리커처 메이커</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>캐리커처 메이커</h1>
+    <p class="subtitle">사진을 찍거나 업로드하면 브라우저에서 바로 캐리커처 스타일로 변환합니다. 이미지는 서버로 전송되지 않습니다.</p>
+  </header>
+
+  <main>
+    <section class="input-panel">
+      <div class="input-buttons">
+        <button id="startCameraBtn" type="button">카메라로 촬영</button>
+        <label class="file-btn">
+          파일 업로드
+          <input id="fileInput" type="file" accept="image/*" hidden>
+        </label>
+      </div>
+
+      <div id="cameraView" class="camera-view" hidden>
+        <video id="video" autoplay playsinline></video>
+        <button id="captureBtn" type="button">촬영</button>
+        <button id="cancelCameraBtn" type="button" class="secondary">취소</button>
+      </div>
+
+      <div class="canvas-row">
+        <div class="canvas-col">
+          <h2>원본</h2>
+          <canvas id="sourceCanvas"></canvas>
+        </div>
+        <div class="canvas-col">
+          <h2>결과</h2>
+          <canvas id="resultCanvas"></canvas>
+        </div>
+      </div>
+
+      <div class="controls">
+        <label>눈 크기 <input id="eyeScale" type="range" min="1" max="2" step="0.05" value="1.4"><span id="eyeScaleVal">1.4</span></label>
+        <label>입 크기 <input id="mouthScale" type="range" min="1" max="2" step="0.05" value="1.3"><span id="mouthScaleVal">1.3</span></label>
+        <label>얼굴 폭 <input id="faceWidth" type="range" min="0.6" max="1.2" step="0.05" value="0.85"><span id="faceWidthVal">0.85</span></label>
+        <label>카툰 강도 <input id="cartoonLevel" type="range" min="2" max="8" step="1" value="5"><span id="cartoonLevelVal">5</span></label>
+      </div>
+
+      <div class="action-buttons">
+        <button id="generateBtn" type="button" disabled>캐리커처 만들기</button>
+        <button id="downloadBtn" type="button" disabled>다운로드</button>
+      </div>
+
+      <p id="status" class="status"></p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
