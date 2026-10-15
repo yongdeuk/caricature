@@ -1,0 +1,9 @@
+name = "caricature-gemini-relay"
+main = "index.js"
+compatibility_date = "2026-01-01"
+
+# Set after deploying:
+#   wrangler secret put GEMINI_API_KEY
+# Optional: restrict CORS to your Pages URL instead of "*"
+[vars]
+ALLOWED_ORIGIN = "https://yongdeuk.github.io"

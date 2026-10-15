@@ -21,14 +21,50 @@ const els = {
   generateBtn: document.getElementById('generateBtn'),
   downloadBtn: document.getElementById('downloadBtn'),
   status: document.getElementById('status'),
+  workerUrlInput: document.getElementById('workerUrlInput'),
+  saveWorkerUrlBtn: document.getElementById('saveWorkerUrlBtn'),
+  aiGenerateBtn: document.getElementById('aiGenerateBtn'),
+  aiDownloadBtn: document.getElementById('aiDownloadBtn'),
+  aiResultImg: document.getElementById('aiResultImg'),
+  aiStatus: document.getElementById('aiStatus'),
 };
 
 let cameraStream = null;
 let modelsReady = false;
+let hasSourceImage = false;
+
+const WORKER_URL_KEY = 'caricature.workerUrl';
 
 function setStatus(msg) {
   els.status.textContent = msg;
 }
+
+function setAiStatus(msg) {
+  els.aiStatus.textContent = msg;
+}
+
+function getWorkerUrl() {
+  return localStorage.getItem(WORKER_URL_KEY) || '';
+}
+
+function updateAiGenerateAvailability() {
+  els.aiGenerateBtn.disabled = !hasSourceImage || !getWorkerUrl();
+}
+
+els.workerUrlInput.value = getWorkerUrl();
+updateAiGenerateAvailability();
+
+els.saveWorkerUrlBtn.addEventListener('click', () => {
+  const url = els.workerUrlInput.value.trim();
+  if (url) {
+    localStorage.setItem(WORKER_URL_KEY, url);
+    setAiStatus('저장되었습니다.');
+  } else {
+    localStorage.removeItem(WORKER_URL_KEY);
+    setAiStatus('Worker 주소를 입력해주세요.');
+  }
+  updateAiGenerateAvailability();
+});
 
 ['eyeScale', 'mouthScale', 'faceWidth', 'cartoonLevel'].forEach((id) => {
   els[id].addEventListener('input', () => {
@@ -66,6 +102,12 @@ function drawImageToSource(imgOrVideo, naturalWidth, naturalHeight) {
   rctx.clearRect(0, 0, w, h);
   els.generateBtn.disabled = false;
   els.downloadBtn.disabled = true;
+
+  hasSourceImage = true;
+  updateAiGenerateAvailability();
+  els.aiDownloadBtn.disabled = true;
+  els.aiResultImg.removeAttribute('src');
+  setAiStatus('');
 }
 
 // ---- Camera ----
@@ -274,5 +316,50 @@ els.downloadBtn.addEventListener('click', () => {
   const link = document.createElement('a');
   link.download = 'caricature.png';
   link.href = els.resultCanvas.toDataURL('image/png');
+  link.click();
+});
+
+// ---- AI (Gemini via Worker) generate flow ----
+els.aiGenerateBtn.addEventListener('click', async () => {
+  const workerUrl = getWorkerUrl();
+  if (!workerUrl) {
+    setAiStatus('먼저 Worker 주소를 저장해주세요.');
+    return;
+  }
+
+  els.aiGenerateBtn.disabled = true;
+  els.aiDownloadBtn.disabled = true;
+  setAiStatus('Gemini에게 캐리커처를 요청하는 중... (몇 초 정도 걸릴 수 있습니다)');
+
+  try {
+    const imageDataUrl = els.sourceCanvas.toDataURL('image/png');
+    const response = await fetch(workerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: imageDataUrl }),
+    });
+
+    const result = await response.json().catch(() => null);
+    if (!response.ok || !result || !result.image) {
+      const message = (result && result.error) || `요청이 실패했습니다 (${response.status})`;
+      throw new Error(message);
+    }
+
+    els.aiResultImg.src = result.image;
+    els.aiDownloadBtn.disabled = false;
+    setAiStatus('완료! 다운로드할 수 있습니다.');
+  } catch (err) {
+    console.error(err);
+    setAiStatus(`오류: ${err.message}`);
+  } finally {
+    updateAiGenerateAvailability();
+  }
+});
+
+els.aiDownloadBtn.addEventListener('click', () => {
+  if (!els.aiResultImg.src) return;
+  const link = document.createElement('a');
+  link.download = 'ai-caricature.png';
+  link.href = els.aiResultImg.src;
   link.click();
 });

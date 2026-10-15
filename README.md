@@ -34,8 +34,45 @@ python3 -m http.server 8000
 - `script.js`의 슬라이더 기본값(`눈 크기`, `입 크기`, `얼굴 폭`, `카툰 강도`)으로 왜곡 정도를 조절합니다.
 - 더 정교한 얼굴 왜곡(코, 턱 등)을 원하면 `applyWarp` 호출부에 랜드마크 기반 영역을 추가하면 됩니다.
 
-## 제한 사항
+## 제한 사항 (로컬 필터 방식)
 
 - 한 장의 사진에서 얼굴 하나만 인식합니다(가장 크게 나온 얼굴 기준).
 - 조명이 어둡거나 얼굴이 작게 나온 사진은 인식률이 떨어질 수 있습니다.
-- AI가 스타일을 새로 "생성"하는 방식이 아니라, 원본 사진을 기하학적으로 왜곡 + 색상 단순화하는 방식입니다.
+- AI가 스타일을 새로 "생성"하는 방식이 아니라, 원본 사진을 기하학적으로 왜곡 + 색상 단순화하는 방식이라 완성도에 한계가 있습니다.
+
+## AI 캐리커처 생성 (Gemini, 선택 기능)
+
+화면 아래쪽 "AI 캐리커처 생성" 섹션은 Google Gemini 이미지 모델(`gemini-2.5-flash-image`)로
+실제 그림체의 캐리커처를 생성합니다. 정적 사이트에서 API 키를 안전하게 숨기기 위해
+Cloudflare Workers를 중계 서버로 사용합니다.
+
+### 1. Gemini API 키 발급
+
+[Google AI Studio](https://aistudio.google.com/apikey)에서 API 키를 발급받습니다.
+
+### 2. Cloudflare Worker 배포
+
+```bash
+cd worker
+npm install -g wrangler   # 최초 1회
+wrangler login            # Cloudflare 계정 로그인 (브라우저 창이 열립니다)
+wrangler deploy           # worker/index.js 배포
+wrangler secret put GEMINI_API_KEY   # 발급받은 Gemini API 키 입력
+```
+
+배포가 끝나면 `https://caricature-gemini-relay.<your-subdomain>.workers.dev` 형태의 주소가 출력됩니다.
+
+`worker/wrangler.toml`의 `ALLOWED_ORIGIN`을 본인의 GitHub Pages 주소로 맞춰두면
+다른 사이트에서 이 Worker를 가져다 쓰는 것을 줄일 수 있습니다(브라우저 기준 CORS 제한이며,
+완전한 차단은 아닙니다 — Cloudflare 대시보드의 Rate Limiting 규칙을 추가로 설정하는 것을 권장합니다).
+
+### 3. 사이트에 Worker 주소 등록
+
+배포된 사이트에서 "AI 캐리커처 생성" → "중계 서버(Worker) 주소 설정"을 펼쳐
+위에서 받은 Worker 주소를 입력하고 저장합니다. 이 주소는 브라우저의 localStorage에만
+저장되며, 저장소 코드에는 포함되지 않습니다.
+
+### 비용
+
+Gemini 이미지 생성 API 호출마다 Google AI 쪽에 과금됩니다(무료 등급 한도 내에서는 무료).
+사용량은 [Google AI Studio](https://aistudio.google.com/)에서 확인할 수 있습니다.

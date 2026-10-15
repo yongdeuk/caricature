@@ -52,6 +52,34 @@
       </div>
 
       <p id="status" class="status"></p>
+
+      <hr class="divider">
+
+      <h2 class="section-title">AI 캐리커처 생성 (Gemini)</h2>
+      <p class="subtitle">사진을 Google Gemini 이미지 모델로 보내 실제 그림체의 캐리커처를 생성합니다. 아래 중계 서버(Worker) 주소를 한 번만 등록하면 됩니다.</p>
+
+      <details class="worker-settings">
+        <summary>중계 서버(Worker) 주소 설정</summary>
+        <div class="worker-settings-row">
+          <input id="workerUrlInput" type="url" placeholder="https://your-worker.workers.dev">
+          <button id="saveWorkerUrlBtn" type="button">저장</button>
+        </div>
+        <p class="hint">worker/ 폴더를 Cloudflare Workers에 배포한 뒤 그 주소를 입력하세요. 이 주소는 이 브라우저에만 저장됩니다.</p>
+      </details>
+
+      <div class="canvas-row">
+        <div class="canvas-col">
+          <h2>AI 결과</h2>
+          <img id="aiResultImg" alt="AI 캐리커처 결과">
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button id="aiGenerateBtn" type="button" disabled>AI로 캐리커처 생성</button>
+        <button id="aiDownloadBtn" type="button" disabled>AI 결과 다운로드</button>
+      </div>
+
+      <p id="aiStatus" class="status"></p>
     </section>
   </main>
 
